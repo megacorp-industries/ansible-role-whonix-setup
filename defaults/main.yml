@@ -1,0 +1,3 @@
+WORKING_DIR: "{{ lookup,('env', 'HOME') }}/whonix_working_dir"
+WHONIX_URL: https://download.whonix.org/libvirt/16.0.9.0/
+WHONIX_ISO: Whonix-XFCE-16.0.9.0.Intel_AMD64.qcow2.libvirt.xz
