@@ -20,11 +20,13 @@
     url: "{{ WHONIX_URL }}/{{ WHONIX_ISO }}"
     dest: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
   when: not whonixFileCheck.stat.exists
+  register: whonixFileDownloaded
 
 - name: Extract downloaded file
   unarchive:
     src: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
     dest: "{{ WORKING_DIR }}"
+  when: whonixFileDownloaded.changed
 
 - name: Define whonix networks
   block:
