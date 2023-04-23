@@ -1,4 +1,21 @@
 ---
+- name: Install virtualization packages
+  community.general.rpm_ostree_pkg:
+    name:
+      - virt-install
+      - libvirt-daemon-config-network
+      - libvirt-daemon-kvm
+      - qemu-kvm
+      - virt-manager
+      - virt-viewer
+    state: present
+
+- name: Create default libvirt network
+  community.libvirt.virt_net:
+    command: define
+    name: default
+    xml: '{{ lookup("template", "files/bridge.xml.j2") }}'
+
 - name: Start and enable on-boot default network
   community.libvirt.virt_net: 
     command: start
