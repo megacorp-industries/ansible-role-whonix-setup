@@ -27,23 +27,15 @@
     path: "{{ WORKING_DIR }}"
     state: directory
 
-- name: Check if whonix tar file exists locally
-  stat:
-    path: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
-  register: whonixFileCheck
-
 - name: Download Whonix image
   get_url:
     url: "{{ WHONIX_URL }}/{{ WHONIX_ISO }}"
     dest: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
-  when: not whonixFileCheck.stat.exists
-  register: whonixFileDownloaded
 
 - name: Extract downloaded file
   unarchive:
     src: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
     dest: "{{ WORKING_DIR }}"
-  when: whonixFileDownloaded.changed
 
 - name: Define whonix networks
   block:
