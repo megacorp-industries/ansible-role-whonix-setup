@@ -9,6 +9,16 @@
       - virt-manager
       - virt-viewer
     state: present
+  when: ansible_facts['distribution'] == 'Silverblue'
+
+- name: Install kali virtualization packages and dependencies
+  apt:
+    name:
+      - qemu-system
+      - libvirt-daemon-system
+      - virt-manager
+    state: present
+  when: ansible_facts['distribution'] == "Kali"
 
 - name: Create default libvirt network
   community.libvirt.virt_net:
@@ -26,11 +36,6 @@
   file:
     path: "{{ WORKING_DIR }}"
     state: directory
-
-- name: Download Whonix image
-  get_url:
-    url: "{{ WHONIX_URL }}/{{ WHONIX_ISO }}"
-    dest: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
 
 - name: Extract downloaded file
   unarchive:
