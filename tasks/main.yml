@@ -132,36 +132,32 @@
         command: define
         xml: "{{ lookup('template', '{{ whonix_workstation_xml_path }}') }}"
 
-- name: Get whonix gateway image file name path
-  find: 
-    path: "{{ WORKING_DIR }}"
-    pattern: Whonix-Gateway*.qcow2
-  register: whonix_gateway_vm
-
-- name: Check if whonix gateway image path exists
+- name: Check if whonix gateway image exists
   stat:
-    path: "{{ whonix_gateway_vm }}"
+    path: /var/lib/libvirt/images/Whonix-Gateway.qcow2
   register: whonix_gateway_vm_exists
 
 - name: Move Whonix Gateway image to libvirt image directory
   block:
+    - name: Get whonix gateway image file name path
+      find: 
+        path: "{{ WORKING_DIR }}"
+        pattern: Whonix-Gateway*.qcow2
+      register: whonix_gateway_vm
+
     - name: Assign whonix gateway image file name to variable
       set_fact:
         whonix_gateway_vm_path: "{{ whonix_gateway_vm.files.0.path }}"
 
-    - name: Move Whonix gateway image to /var/lib/libvirt/images
-      command: mv {{ whonix_gateway_vm_path }} /var/lib/libvirt/images/Whonix-Gateway.qcow2
-  when: whonix_gateway_vm_exists.stat.exists
+    - name: Copy Whonix gateway image to /var/lib/libvirt/images
+      copy:
+        src: "{{ whonix_gateway_vm_path }}" 
+        dest: /var/lib/libvirt/images/Whonix-Gateway.qcow2
+  when: not whonix_gateway_vm_exists.stat.exists
 
-- name: Get whonix workstation image file name path
-  find: 
-    path: "{{ WORKING_DIR }}"
-    pattern: Whonix-Workstation*.qcow2
-  register: whonix_workstation_vm
-
-- name: Check if whonix gateway image path exists
+- name: Check if whonix workstation image path exists
   stat:
-    path: "{{ whonix_workstation_vm }}"
+    path: /var/lib/libvirt/images/Whonix-Workstation.qcow2
   register: whonix_workstation_vm_exists
 
 - name: Move Whonix Workstation image to libvirt image directory
@@ -177,5 +173,7 @@
         whonix_workstation_vm_path: "{{ whonix_workstation_vm.files.0.path }}"
 
     - name: Move Whonix workstation image to /var/lib/libvirt/images
-      command: mv {{ whonix_workstation_vm_path }} /var/lib/libvirt/images/Whonix-Workstation.qcow2
-  when: whonix_workstation_vm_exists.stat.exists
+      copy:
+        src: "{{ whonix_workstation_vm_path }}" 
+        dest: /var/lib/libvirt/images/Whonix-Workstation.qcow2
+  when: not whonix_workstation_vm_exists.stat.exists
