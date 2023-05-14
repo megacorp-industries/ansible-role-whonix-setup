@@ -1,5 +1,5 @@
 ---
-- name: Install virtualization packages and dependencies
+- name: Install rpm virtualization packages and dependencies
   community.general.rpm_ostree_pkg:
     name:
       - virt-install
@@ -9,6 +9,15 @@
       - virt-manager
       - virt-viewer
     state: present
+  when: ansible_facts['distribution'] == "Silverblue"
+
+- name: Install kali virtualization packages and dependencies
+  apt:
+    name:
+      - qemu-system
+      - libvirt-daemon-system
+    state: present
+  when: ansible_facts['distribution'] == "Kali"
 
 - name: Create default libvirt network
   community.libvirt.virt_net:
@@ -22,26 +31,16 @@
     autostart: true
     name: default
 
-- name: Create working directory
-  file:
-    path: "{{ WORKING_DIR }}"
-    state: directory
-
-- name: Download Whonix image
-  get_url:
-    url: "{{ WHONIX_URL }}/{{ WHONIX_ISO }}"
-    dest: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
-
 - name: Extract downloaded file
   unarchive:
-    src: "{{ WORKING_DIR }}/{{ WHONIX_ISO }}"
-    dest: "{{ WORKING_DIR }}"
+    src: "/home/dedsec/Downloads/{{ WHONIX_ISO }}"
+    dest: /tmp
 
 - name: Define whonix networks
   block:
     - name: Get whonix internal network file name path
       find: 
-        path: "{{ WORKING_DIR }}"
+        path: /tmp
         pattern: Whonix_internal*.xml
       register: whonix_internal_network
 
@@ -69,7 +68,7 @@
 
     - name: Get whonix external netowrk file name path
       find: 
-        path: "{{ WORKING_DIR }}"
+        path: /tmp
         pattern: Whonix_external*.xml
       register: whonix_external_network
 
@@ -99,7 +98,7 @@
   block:
     - name: Get whonix gateway xml file name path
       find: 
-        path: "{{ WORKING_DIR }}"
+        path: /tmp
         pattern: Whonix-Gateway*.xml
       register: whonix_gateway_xml
 
@@ -114,7 +113,7 @@
 
     - name: Get whonix workstation xml file name path
       find: 
-        path: "{{ WORKING_DIR }}"
+        path: /tmp
         pattern: Whonix-Workstation*.xml
       register: whonix_workstation_xml
 
@@ -129,7 +128,7 @@
 
 - name: Get whonix gateway image file name path
   find: 
-    path: "{{ WORKING_DIR }}"
+    path: /tmp
     pattern: Whonix-Gateway*.qcow2
   register: whonix_gateway_vm
 
@@ -150,7 +149,7 @@
 
 - name: Get whonix workstation image file name path
   find: 
-    path: "{{ WORKING_DIR }}"
+    path: /tmp
     pattern: Whonix-Workstation*.qcow2
   register: whonix_workstation_vm
 
@@ -163,7 +162,7 @@
   block:
     - name: Get whonix workstation image file name path
       find: 
-        path: "{{ WORKING_DIR }}"
+        path: /tmp
         pattern: Whonix-Workstation*.qcow2
       register: whonix_workstation_vm
 
